@@ -1,0 +1,84 @@
+1. COMPILING and INSTALLING
+
+To compile and run URONode you will need to have libax25-0.0.4 or newer
+installed on your system. It should work on any platform where libax25 can
+be compiled and installed. 
+Note however that it will NOT work with 2.0.x kernels.
+
+To install you should first run:
+
+  ./configure
+
+and answer to the questions it makes. 
+
+** IF ** this is an ** UPGRADE **:
+and if you said no to configure running a "make", just type:
+make; make upgrade
+This will *not* overwrite your config files, and will freshen up
+your binaries only. If you told the configure script to make, then
+all you need to type to upgrade is: make upgrade.
+
+** IF ** this is a new install:
+
+If all files needed are present everything should work. Next:
+
+  make (if you said "no" to the configure script launching it for you)
+  make install
+  make installhelp
+
+Optionally you may want to run also:
+
+  make installconf
+
+to install the default configuration files. 
+Note however this copy example files in /etc/ax25 but with ".ex". 
+You should rename it by removing ".ex" at the end of filenames.
+
+After that you need to edit the configuration files to suit your system. 
+The manual pages for uronode.conf(5) and uronode.perms(5) should give
+an idea of what to put into these files. The AX25-HOWTO is a must read also.
+
+2. RUNNING
+
+URONode is intended to be called from ax25d or inetd. It doesn't need
+any command line arguments. See the uronode(8) manual page.
+
+To run URONode from ax25d, /etc/ax25/ax25d.conf should have something
+like this in it:
+
+  # AX25 Port ax0
+  # Belows SSID can not be the same as your netrom node SSID!
+  [N1URO-2 VIA ax0]
+  default  * * * * * *  -    root  /usr/sbin/uronode  uronode
+
+  # NETROM Port
+  <nr0>
+  default  * * * * * *  -    root  /usr/sbin/uronode  uronode
+
+add uronode as a service in /etc/services:
+uronode         3694/tcp                        # Node/URONode packet
+
+if you use inetd -
+/etc/inetd.conf could have something like this in it:
+
+# Listen at telnet port -> URONode
+uronode  stream  tcp     nowait  nobody    /usr/sbin/uronode  uronode
+
+if you use xinetd -
+/etc/xinetd.d/uronode should look like this:
+
+service uronode
+{
+        disable         = no
+        socket_type     = stream
+        protocol        = tcp
+        user            = nobody
+        server          = /usr/sbin/uronode
+        wait            = no
+        instances       = 20
+}
+
+If you have received this from a pre-package such as an RPM, the authors
+of URONode will not support this as they will not make a pre-packaged
+URONode .rpm or .deb file.
+
